@@ -1,20 +1,25 @@
 import pickle
-from collections import Counter
 import re
+import pandas as pd
+import math
+
+from collections import Counter
 
 class WordTool():
 
 	def __init__(self):
 
-		self.letters = []
-		with open('child_dico.txt') as fin:
-			lines = (word.strip().upper() for word in fin)
-			self.easy_words = [(word, Counter(word)) for word in lines  if not re.match(r'.*[\%\$\^\*\@\!\_\-\(\)\:\;\'\"\{\}\[\]].*', word) and len(word) < 8 and len(word) >= 2]
+		self.words = {}
+		self.df_req = pd.read_csv("requirement.csv")
 
-		with open('/usr/share/dict/words') as fin:
-			lines = (word.strip().upper() for word in fin)
-			self.words = [(word, Counter(word)) for word in lines  if not re.match(r'.*[\%\$\^\*\@\!\_\-\(\)\:\;\'\"\{\}\[\]].*', word) and len(word) < 8 and len(word) >= 2]
 
+		# create lsit of words
+		with open('child_dico.txt') as fin:    #open('/usr/share/dict/words')
+			lines = (word.strip().upper() for word in fin)
+
+			for word in lines:
+				if not re.match(r'.*[\%\$\^\*\@\!\_\-\(\)\:\;\'\"\{\}\[\]].*', word) and len(word) < 8 and len(word) >= 3 and " " not in word:
+					self.words[word.lower()] = {"pertinence": 0, "mastery": 0, "uncertainty": 0}
 
 	def separateWordsToLetters(self, word, boxes, height, pix_to_meter):
 
@@ -34,8 +39,7 @@ class WordTool():
 
 		return letters
 
-
-	def findWordWithLetters(self, letters, childMode=True):
+	def findWordWithLetters(self, letters, childMode=True): # deprecated
 
 		rack = Counter(letters.upper())
 
@@ -50,3 +54,43 @@ class WordTool():
 				if len(scrabble_word) >= len(letters) and not (rack - letter_count):
 					return(scrabble_word)
 
+	def activationFct(self, x):
+		x = (x - .5)*3.
+		fact = 1.2
+
+		return ((math.exp(fact*x) - math.exp(-fact*x))/(math.exp(fact*x)+math.exp(-fact*x)) + 1)/2.
+
+	def updateWords(self, glyphs):
+
+		for word in self.words:
+			self.words[word]["pertinence"] = self.computePertinence(glyphs, word)
+			self.words[word]["mastery"] = self.computeMastery(glyphs, word)
+			self.words[word]["uncertainty"] = self.computeUncertainty(glyphs, word)
+
+	def computePertinence(self, glyphs, word):
+
+		pertinence = 0
+		for letter in word:
+			if letter in self.df_req.letter.unique():
+				pertinence += self.activationFct(glyphs[letter].getMastery())
+			else:
+				pertinence += 1
+
+
+		return pertinence / float(len(word))
+
+	def computeMastery(self, glyphs, word):
+
+		mastery = 0
+		for letter in word:
+			mastery += glyphs[letter].getMastery()
+
+		return (mastery/float(len(word)))
+
+	def computeUncertainty(self, glyphs, word):
+
+		uncertainty = 0
+		for letter in word:
+			uncertainty += glyphs[letter].getUncertainty()
+
+		return uncertainty / float(len(word))

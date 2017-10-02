@@ -83,6 +83,9 @@
    </property>
   </widget>
   <widget class="QPushButton" name="buttonPredict">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>130</x>
