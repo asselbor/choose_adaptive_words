@@ -65,6 +65,7 @@ class Activity(QtWidgets.QDialog):
 		self.tactileSurface.signalRobotFinishWriting.connect(self.callback_RobotFinishWriting)
 		self.buttonSendRobot.clicked.connect(self.buttonSendRobotClicked)
 
+
 	def initSkills(self):
 		for glyph in "abcdefghijklmnopqrstuvwxyz":
 			self.skills[glyph] = Glyph(glyph)
@@ -153,7 +154,11 @@ class Activity(QtWidgets.QDialog):
 		# get letters from boxes
 		trace = self.tactileSurface.getData()
 		boxes = self.tactileSurface.boxesToDraw
-		letters = self.wt.separateWordsToLetters(trace, boxes, self.tactileSurface.height(), self.tactileSurface.convert_pix_meter)
+		letters = self.wt.separateWordsToLetters(trace, boxes, self.tactileSurface.height() - yBeginningTactile, self.tactileSurface.convert_pix_meter, self.tactileSurface.mapToGlobal(self.tactileSurface.pos()))
+
+
+		print(letters)
+		print(self.lettersToWrite)
 		
 		# compute score of all letters
 		for index in letters:

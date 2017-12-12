@@ -21,7 +21,7 @@ class WordTool():
 				if not re.match(r'.*[\%\$\^\*\@\!\_\-\(\)\:\;\'\"\{\}\[\]].*', word) and len(word) < 8 and len(word) >= 3 and " " not in word:
 					self.words[word.lower()] = {"pertinence": 0, "mastery": 0, "uncertainty": 0}
 
-	def separateWordsToLetters(self, word, boxes, height, pix_to_meter):
+	def separateWordsToLetters(self, word, boxes, height, pix_to_meter, absToRel):
 
 		letters = {}
 		for i in range(len(boxes)):
@@ -31,9 +31,8 @@ class WordTool():
 		for data in word:
 			for i, box in enumerate(boxes):
 
-				x =  data.x*pix_to_meter
-				y = -data.y*pix_to_meter + height*pix_to_meter
-
+				x =  data.x*pix_to_meter - absToRel.x()*pix_to_meter
+				y = -(data.y*pix_to_meter - absToRel.y()*pix_to_meter) + height*pix_to_meter 
 				if x >= box[0] and x < box[2] and y >= box[1] and y < box[3]:
 					letters[i].append(data)
 

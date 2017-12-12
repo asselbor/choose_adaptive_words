@@ -74,7 +74,8 @@ class TactileSurfaceArea(QTableWidget):
 				self.updateBrush(event)
 				painter = QPainter(self.pixmapHandwriting)
 				self.paintPixmap(painter, event)
-				self.data.append(Data(self.time.elapsed(), event.posF().x(), event.posF().y(), event.xTilt(), event.yTilt(), event.pressure()))
+				self.data.append(Data(self.time.elapsed(), event.hiResGlobalX(), event.hiResGlobalY(), event.xTilt(), event.yTilt(), event.pressure()))
+				print(self.time.elapsed(), event.hiResGlobalX(), event.hiResGlobalY(), event.xTilt(), event.yTilt(), event.pressure())
 		
 	def updateBrush(self, event):
 		#hue, saturation, value, alpha;

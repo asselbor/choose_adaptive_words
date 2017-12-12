@@ -118,7 +118,7 @@ class Predictor():
             softmax = self.model.predict([x], seqLen)[0]
         except:
             pass
-
+            
         return softmax[int(self.codeChar(glyphWritten))]
 
     def createDF(self, laterality, gender, ageMonth, grade, data):

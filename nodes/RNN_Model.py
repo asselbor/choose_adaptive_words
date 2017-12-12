@@ -42,7 +42,7 @@ class Model():
 
 
 		self.cell = tf.contrib.rnn.LSTMCell(lstm_size, state_is_tuple=True)
-		self.stacked_lstm = tf.contrib.rnn.MultiRNNCell([self.cell] * 2, state_is_tuple=True)
+		self.stacked_lstm = tf.contrib.rnn.MultiRNNCell([tf.contrib.rnn.LSTMCell(lstm_size, state_is_tuple=True) for _ in range(2)])
 		self.val, self.state = tf.nn.dynamic_rnn(self.stacked_lstm, self.data, dtype=tf.float32, sequence_length=self.seqlen)
 
 
